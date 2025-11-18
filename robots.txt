@@ -1,0 +1,5 @@
+# Robots.txt for Iraq Store
+User-agent: *
+Allow: /
+
+Sitemap: https://sherow1982.github.io/Iraq-Store/sitemap.xml
