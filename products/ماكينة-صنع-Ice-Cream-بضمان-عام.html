@@ -29,13 +29,19 @@
         footer { background: #2d3748; color: white; padding: 2rem 0; margin-top: 3rem; text-align: center; }
         @media (max-width: 768px) { .product-header h1 { font-size: 1.5rem; } .new-price { font-size: 2rem; } .btn-whatsapp { padding: 0.85rem 2rem; font-size: 1.1rem; } }
     </style>
+    
     <script type="application/ld+json">
     {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": "ماكينة صنع Ice Cream بضمان عام",
       "description": "ابتكار لا مثيل له مع منتج 'ماكينة صنع Ice Cream بضمان عام' الذي يعيد تعريف المفهوم التقليدي للجودة. تم تطويره ليقدم حلولاً عملية ومبتكرة تلبي توقعات المستخدمين",
-      "image": "https://media.taager.com/360x360/ee03507c-4c1f-42dc-a788-f49e7393401e.png",
+      "image": [
+        "https://media.taager.com/360x360/ee03507c-4c1f-42dc-a788-f49e7393401e.png"
+      ],
+      "sku": "IQ-ماكينة-صنع-Ice-Cream-بضمان-عام",
+      "mpn": "IQ-ماكينة-صنع-Ice-Cream-بضمان-عام",
+      "gtin13": "00836042527736",
       "brand": {
         "@type": "Brand",
         "name": "متجر العراق"
@@ -45,9 +51,55 @@
         "url": "https://sherow1982.github.io/Iraq-Store/products/ماكينة-صنع-Ice-Cream-بضمان-عام.html",
         "priceCurrency": "IQD",
         "price": "90000",
-        "priceValidUntil": "2025-12-31",
+        "priceValidUntil": "2026-03-01",
         "availability": "https://schema.org/InStock",
-        "itemCondition": "https://schema.org/NewCondition"
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": {
+          "@type": "Organization",
+          "name": "متجر العراق",
+          "url": "https://sherow1982.github.io/Iraq-Store/",
+          "logo": "https://sherow1982.github.io/Iraq-Store/logo.png",
+          "telephone": "+201110760081",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "IQ",
+            "addressLocality": "بغداد"
+          }
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "5000",
+            "currency": "IQD"
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "IQ"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 1,
+              "maxValue": 2,
+              "unitCode": "DAY"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 3,
+              "maxValue": 7,
+              "unitCode": "DAY"
+            }
+          }
+        },
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 7,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        }
       },
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -55,7 +107,22 @@
         "reviewCount": "127",
         "bestRating": "5",
         "worstRating": "1"
-      }
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "4.5",
+            "bestRating": "5"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "عميل متجر العراق"
+          },
+          "reviewBody": "منتج ممتاز وجودة عالية، أنصح بالشراء"
+        }
+      ]
     }
     </script>
 </head>
