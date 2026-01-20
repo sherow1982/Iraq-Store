@@ -36,6 +36,7 @@
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://media.taager.com">
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://media.taager.com">
     
@@ -43,7 +44,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Cairo Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 
     <!-- Tailwind Config -->
     <script>
@@ -158,7 +160,7 @@
                         <img src="https://via.placeholder.com/600x600?text=Iraq+Store" 
                              alt="مبرد هواء محمول صغير" 
                              class="product-image w-full h-full object-cover"
-                             loading="eager"
+                             loading="eager" fetchpriority="high" width="360" height="360"
                              itemprop="image"
                              onerror="this.src='https://via.placeholder.com/600x600?text=Iraq+Store'">
                         <span class="absolute top-2 right-2 bg-iraqi-red text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-2 rounded-full shadow-lg">خصم 16%</span>
@@ -166,7 +168,7 @@
                     <!-- Thumbnails -->
                     <div class="hidden sm:grid grid-cols-3 gap-3 mt-4">
                         <div class="border-2 border-iraqi-red rounded-lg p-1 cursor-pointer">
-                            <img src="https://via.placeholder.com/600x600?text=Iraq+Store" alt="مبرد هواء محمول صغير" class="w-full h-full object-cover rounded-md" loading="lazy">
+                            <img src="https://via.placeholder.com/600x600?text=Iraq+Store" alt="مبرد هواء محمول صغير" class="w-full h-full object-cover rounded-md" loading="lazy" width="120" height="120">
                         </div>
                         <div class="border border-gray-200 rounded-lg p-1 hover:border-iraqi-red transition-colors cursor-pointer">
                             <img src="https://via.placeholder.com/600x600?text=Iraq+Store" alt="مبرد هواء محمول صغير" class="w-full h-full object-cover rounded-md opacity-60" loading="lazy">
