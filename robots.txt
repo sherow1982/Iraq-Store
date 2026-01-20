@@ -1,5 +1,23 @@
-# Robots.txt for Iraq Store
+# Robots.txt for Iraq Store - متجر العراق
+# https://sherow1982.github.io/Iraq-Store/
+
 User-agent: *
 Allow: /
+Disallow: /products/*.html?*
+Disallow: /*.json$
 
+# Crawl-delay for better server performance
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://sherow1982.github.io/Iraq-Store/sitemap.xml
+
+# Allow all major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

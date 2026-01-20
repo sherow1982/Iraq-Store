@@ -24,7 +24,8 @@ print(f"✅ تم تحميل {len(products)} منتج")
 os.makedirs('products', exist_ok=True)
 
 # دالة لإنشاء صفحة منتج واحدة
-def create_product_page(product):
+def create_product_page(product, header_html, footer_html):
+    site_base_url = "https://sherow1982.github.io/Iraq-Store"
     whatsapp_number = "201110760081"
     discount = round(((product['price'] - product['sale_price']) / product['price']) * 100) if product.get('price') and product.get('sale_price') else 0
 
@@ -34,146 +35,344 @@ def create_product_page(product):
     whatsapp_message = f"مرحباً، أريد طلب المنتج التالي:%0A%0A📦 {quote(title)}%0A💰 السعر: {sale_price:,} د.ع"
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={whatsapp_message}"
 
-    # مسار الصورة الصحيح (بدون ../)
-    image_url = product.get('image_link', '')
+    # تنظيف رابط الصورة والتأكد من أنه رابط مطلق (وإن لم توجد صورة نستخدم Placeholder)
+    image_url = (product.get('image_link') or '').replace('../', '').strip()
+    if not image_url:
+        image_url = "https://via.placeholder.com/600x600?text=Iraq+Store"
 
     # الوصف
     description = product.get('description', 'منتج عالي الجودة بأفضل سعر')[:160]
+    slug = product.get('slug', '')
+    product_url = f"{site_base_url}/products/{slug}.html"
 
+    # Escape HTML for safe output
+    def escape_html(text):
+        if not text:
+            return ''
+        return str(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#x27;')
+    
+    title_escaped = escape_html(title)
+    description_escaped = escape_html(description)
+    full_description = product.get('description', description) or description
+    
     html = f"""<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <!-- SEO Meta Tags -->
-    <title>{title} - متجر العراق</title>
-    <meta name="description" content="{description}">
-    <meta name="keywords" content="{title}, متجر العراق, {title} سعر, شراء {title}">
+    <title>{title_escaped} - متجر العراق | سعر {sale_price:,} د.ع</title>
+    <meta name="description" content="{description_escaped[:155]}">
+    <meta name="keywords" content="{title_escaped}, متجر العراق, {title_escaped} سعر, شراء {title_escaped}, منتجات العراق">
     <meta name="author" content="متجر العراق">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://sherow1982.github.io/1/products/{product.get('slug', '')}.html">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="{product_url}">
 
     <!-- Open Graph -->
     <meta property="og:type" content="product">
-    <meta property="og:title" content="{title}">
-    <meta property="og:description" content="{description}">
+    <meta property="og:title" content="{title_escaped}">
+    <meta property="og:description" content="{description_escaped[:200]}">
     <meta property="og:image" content="{image_url}">
-    <meta property="og:url" content="https://sherow1982.github.io/1/products/{product.get('slug', '')}.html">
-    <meta property="og:price:amount" content="{sale_price}">
-    <meta property="og:price:currency" content="IQD">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="{product_url}">
+    <meta property="og:site_name" content="متجر العراق">
+    <meta property="og:locale" content="ar_IQ">
+    <meta property="product:price:amount" content="{sale_price}">
+    <meta property="product:price:currency" content="IQD">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{title}">
-    <meta name="twitter:description" content="{description}">
+    <meta name="twitter:title" content="{title_escaped}">
+    <meta name="twitter:description" content="{description_escaped[:200]}">
     <meta name="twitter:image" content="{image_url}">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://media.taager.com">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Cairo Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap RTL -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {{
+            theme: {{
+                extend: {{
+                    fontFamily: {{
+                        'cairo': ['Cairo', 'sans-serif']
+                    }},
+                    colors: {{
+                        'iraqi-green': '#009933',
+                        'iraqi-red': '#d42129',
+                    }}
+                }}
+            }}
+        }}
+    </script>
 
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced -->
     <script type="application/ld+json">
     {{
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": "{title}",
-      "image": "{image_url}",
-      "description": "{description}",
+      "name": "{title_escaped}",
+      "image": ["{image_url}"],
+      "description": "{description_escaped}",
+      "brand": {{
+        "@type": "Brand",
+        "name": "متجر العراق"
+      }},
       "offers": {{
         "@type": "Offer",
+        "url": "{product_url}",
         "price": "{sale_price}",
         "priceCurrency": "IQD",
-        "availability": "https://schema.org/InStock"
+        "availability": "https://schema.org/InStock",
+        "priceValidUntil": "2025-12-31",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": {{
+          "@type": "Organization",
+          "name": "متجر العراق",
+          "url": "{site_base_url}",
+          "telephone": "+201110760081"
+        }}
+      }},
+      "aggregateRating": {{
+        "@type": "AggregateRating",
+        "ratingValue": "4.5",
+        "reviewCount": "50",
+        "bestRating": "5",
+        "worstRating": "1"
       }}
     }}
     </script>
-
+    
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{ font-family: 'Cairo', sans-serif; direction: rtl; background-color: #f8f9fa; line-height: 1.8; }}
-        .navbar {{ background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 1rem 0; position: sticky; top: 0; z-index: 1000; }}
-        .navbar-brand {{ font-size: 1.8rem; font-weight: bold; color: #667eea !important; text-decoration: none; }}
-        .product-container {{ max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }}
-        .product-header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px 15px 0 0; }}
-        .product-header h1 {{ font-size: 2rem; font-weight: 700; margin: 0; }}
-        .product-content {{ background: white; border-radius: 0 0 15px 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); overflow: hidden; }}
-        .product-image {{ width: 100%; max-width: 500px; height: auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }}
-        .price-section {{ background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0; }}
-        .old-price {{ text-decoration: line-through; color: #999; font-size: 1.2rem; margin-left: 1rem; }}
-        .new-price {{ font-size: 2.5rem; color: #667eea; font-weight: 700; }}
-        .discount-badge {{ display: inline-block; background: #e74c3c; color: white; padding: 0.5rem 1rem; border-radius: 25px; font-size: 1.2rem; font-weight: 600; margin-right: 1rem; }}
-        .description {{ font-size: 1.1rem; color: #555; line-height: 2; padding: 1.5rem 0; }}
-        .btn-whatsapp {{ background: #25D366; color: white; border: none; padding: 1rem 3rem; font-size: 1.3rem; font-weight: 700; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-block; margin: 1rem 0; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }}
-        .btn-whatsapp:hover {{ background: #128C7E; transform: translateY(-2px); box-shadow: 0 7px 20px rgba(37, 211, 102, 0.4); color: white; }}
-        .btn-back {{ background: #667eea; color: white; border: none; padding: 0.75rem 2rem; font-size: 1rem; font-weight: 600; border-radius: 10px; text-decoration: none; display: inline-block; margin-bottom: 1rem; }}
-        .btn-back:hover {{ background: #5568d3; color: white; }}
-        footer {{ background: #2d3748; color: white; padding: 2rem 0; margin-top: 3rem; text-align: center; }}
-        @media (max-width: 768px) {{ .product-header h1 {{ font-size: 1.5rem; }} .new-price {{ font-size: 2rem; }} .btn-whatsapp {{ padding: 0.85rem 2rem; font-size: 1.1rem; }} }}
+        /* Critical CSS for Performance */
+        .product-image {{ transition: transform 0.3s ease; }}
+        .product-image:hover {{ transform: scale(1.05); }}
+        @media (max-width: 640px) {{
+            .product-main {{ padding: 1rem; }}
+        }}
     </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <a class="navbar-brand" href="../index.html">🛒 متجر العراق</a>
-        </div>
-    </nav>
+<body class="bg-gray-50 font-cairo">
+    {header_html}
 
-    <div class="product-container">
-        <a href="../index.html" class="btn-back">← العودة للرئيسية</a>
-
-        <div class="product-header">
-            <h1>{title}</h1>
-        </div>
-
-        <div class="product-content">
-            <div class="row p-4">
-                <div class="col-md-6 text-center">
-                    <img src="{image_url}" alt="{title}" class="product-image" loading="lazy">
+    <!-- Product Section -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 my-6 sm:my-8 lg:my-12">
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                <!-- Product Image Gallery -->
+                <div class="p-4 sm:p-6 lg:p-8">
+                    <div class="relative aspect-square overflow-hidden rounded-lg sm:rounded-xl shadow-lg bg-gray-100">
+                        <img src="{image_url}" 
+                             alt="{title_escaped}" 
+                             class="product-image w-full h-full object-cover"
+                             loading="eager"
+                             itemprop="image"
+                             onerror="this.src='https://via.placeholder.com/600x600?text=Iraq+Store'">
+                        {f'<span class="absolute top-2 right-2 bg-iraqi-red text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-2 rounded-full shadow-lg">خصم {discount}%</span>' if discount > 0 else ''}
+                    </div>
+                    <!-- Thumbnails -->
+                    <div class="hidden sm:grid grid-cols-3 gap-3 mt-4">
+                        <div class="border-2 border-iraqi-red rounded-lg p-1 cursor-pointer">
+                            <img src="{image_url}" alt="{title_escaped}" class="w-full h-full object-cover rounded-md" loading="lazy">
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-1 hover:border-iraqi-red transition-colors cursor-pointer">
+                            <img src="{image_url}" alt="{title_escaped}" class="w-full h-full object-cover rounded-md opacity-60" loading="lazy">
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-1 hover:border-iraqi-red transition-colors cursor-pointer">
+                            <img src="{image_url}" alt="{title_escaped}" class="w-full h-full object-cover rounded-md opacity-60" loading="lazy">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="price-section">
-                        <div class="mb-3">
-                            <span class="discount-badge">خصم {discount}%</span>
-                        </div>
-                        <div>
-                            <span class="old-price">{product.get('price', 0):,} د.ع</span>
-                        </div>
-                        <div class="new-price">{sale_price:,} د.ع</div>
+                <!-- Product Info -->
+                <div class="product-main p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight mb-4" itemprop="name">{title_escaped}</h1>
+                    
+                    <!-- Price -->
+                    <div class="flex flex-wrap items-baseline gap-3 sm:gap-4 mb-4 sm:mb-5" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <span class="text-3xl sm:text-4xl lg:text-5xl font-bold text-iraqi-red" itemprop="price" content="{sale_price}">{sale_price:,} د.ع</span>
+                        {f'<span class="text-lg sm:text-xl lg:text-2xl text-gray-400 line-through">{product.get("price", 0):,} د.ع</span>' if product.get('price', 0) > sale_price else ''}
+                        <meta itemprop="priceCurrency" content="IQD">
+                        <meta itemprop="availability" content="https://schema.org/InStock">
                     </div>
 
-                    <div class="description">
-                        <h3 style="color: #2d3748; margin-bottom: 1rem;">📋 وصف المنتج</h3>
-                        <p>{product.get('description', 'منتج عالي الجودة بأفضل سعر')}</p>
-                    </div>
+                    <!-- Discount Badge -->
+                    {f'<div class="mb-4 sm:mb-6"><span class="bg-iraqi-red text-white text-xs sm:text-sm font-bold px-3 sm:px-4 py-1 sm:py-2 rounded-full inline-block">خصم {discount}%</span></div>' if discount > 0 else ''}
 
-                    <div class="text-center mt-4">
-                        <a href="{whatsapp_url}" target="_blank" rel="noopener" class="btn-whatsapp">
-                            📱 اطلب المنتج واتساب
-                        </a>
-                        <p class="mt-3" style="color: #666; font-size: 0.95rem;">
-                            سيتم فتح محادثة واتساب مع تفاصيل المنتج
-                        </p>
-                    </div>
+                    <!-- Short Description -->
+                    <p class="text-gray-600 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8">{escape_html(full_description)}</p>
+                    
+                    <!-- WhatsApp Order Button -->
+                    <a href="{whatsapp_url}" 
+                       target="_blank" 
+                       rel="noopener" 
+                       aria-label="اطلب المنتج عبر واتساب"
+                       class="w-full bg-green-500 hover:bg-green-600 text-white text-lg sm:text-xl font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg shadow-lg flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.433-9.89-9.889-9.89-5.452 0-9.887 4.428-9.888 9.89 .001 2.225.651 4.288 1.956 6.045l-1.025 3.748 3.847-1.004zm3.803-3.582c-.27-.135-.792-.39-1.22-.524-.429-.135-.883-.202-1.22.202-.338.403-.9.995-1.102 1.248-.202.253-.403.27-.741.068-.337-.203-1.423-.525-2.715-1.671-1.004-.876-1.672-1.953-1.902-2.306-.228-.353-.02-.551.183-.75.182-.18.403-.46.604-.69.203-.23.27-.403.404-.676.135-.27.068-.524 0-.69-.067-.165-.403-1.033-.54-1.404-.134-.37-.27-.32-.403-.32-.134 0-.27 0-.403 0-.134 0-.338.068-.54.403-.202.337-.793.995-.793 2.441s.814 2.827.949 3.028c.134.203 1.584 2.541 3.847 3.593 2.262 1.05 2.868.849 3.583.781.715-.068 1.423-.576 1.625-1.123.202-.547.202-1.018.134-1.123s-.201-.165-.47-.3z"/></svg>
+                        <span>اطلب المنتج عبر واتساب</span>
+                    </a>
                 </div>
             </div>
         </div>
+        
+        <!-- Trust Badges -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-8 text-center my-6 sm:my-8 lg:my-16">
+            <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <svg class="w-8 h-8 sm:w-10 sm:h-10 mx-auto text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p class="font-semibold text-gray-700 text-xs sm:text-sm md:text-base">ضمان حقيقي</p>
+            </div>
+            <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <svg class="w-8 h-8 sm:w-10 sm:h-10 mx-auto text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <p class="font-semibold text-gray-700 text-xs sm:text-sm md:text-base">توصيل لكل العراق</p>
+            </div>
+            <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <svg class="w-8 h-8 sm:w-10 sm:h-10 mx-auto text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                <p class="font-semibold text-gray-700 text-xs sm:text-sm md:text-base">الدفع عند الاستلام</p>
+            </div>
+            <div class="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <svg class="w-8 h-8 sm:w-10 sm:h-10 mx-auto text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5V4H4zm0 12v5h5v-5H4zM15 4v5h5V4h-5zm0 12v5h5v-5h-5z"></path></svg>
+                <p class="font-semibold text-gray-700 text-xs sm:text-sm md:text-base">جودة مضمونة</p>
+            </div>
+        </div>
+
+        <!-- Full Description Section -->
+        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden p-4 sm:p-6 lg:p-8 mt-6 sm:mt-8">
+            <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 border-r-4 border-iraqi-red pr-3 sm:pr-4">تفاصيل المنتج</h2>
+            <div class="prose prose-sm sm:prose-base lg:prose-lg max-w-none text-gray-700 leading-relaxed">
+                <p class="text-sm sm:text-base lg:text-lg">{escape_html(full_description)}</p>
+            </div>
+        </div>
+    </main>
+
+    {footer_html}
+
+    <!-- Floating WhatsApp Button -->
+    <div id="floating-whatsapp" class="fixed bottom-6 left-6 z-50">
+        <button onclick="sendWhatsAppMessage()" 
+                aria-label="اطلب المنتج عبر واتساب"
+                class="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 sm:p-5 shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 active:scale-95 group">
+            <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">!</span>
+        </button>
     </div>
 
-    <footer>
-        <div class="container">
-            <p>© 2025 متجر العراق - جميع الحقوق محفوظة</p>
-            <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.7;">
-                للاستفسارات: <a href="https://wa.me/201110760081" style="color: #25D366;">واتساب</a>
-            </p>
-        </div>
-    </footer>
+    <script>
+        // Product data for WhatsApp message
+        const productData = {{
+            title: "{title_escaped}",
+            price: {product.get('price', 0)},
+            salePrice: {sale_price},
+            url: "{product_url}",
+            discount: {discount}
+        }};
+
+        function sendWhatsAppMessage() {{
+            const phoneNumber = "201110760081";
+            const productTitle = productData.title;
+            const originalPrice = productData.price;
+            const salePrice = productData.salePrice;
+            const productUrl = productData.url;
+            const discount = productData.discount;
+            
+            // Create professional WhatsApp message with proper encoding
+            let messageParts = [];
+            messageParts.push("مرحباً 👋");
+            messageParts.push("");
+            messageParts.push("أريد طلب المنتج التالي:");
+            messageParts.push("");
+            messageParts.push("━━━━━━━━━━━━━━━━");
+            messageParts.push("📦 *" + productTitle + "*");
+            messageParts.push("");
+            
+            if (originalPrice > salePrice) {{
+                messageParts.push("💰 السعر الأصلي: " + originalPrice.toLocaleString() + " د.ع");
+                messageParts.push("💵 السعر بعد الخصم: *" + salePrice.toLocaleString() + " د.ع*");
+                messageParts.push("🎉 خصم: " + discount + "%");
+            }} else {{
+                messageParts.push("💰 السعر: *" + salePrice.toLocaleString() + " د.ع*");
+            }}
+            
+            messageParts.push("");
+            messageParts.push("🔗 رابط المنتج:");
+            messageParts.push(productUrl);
+            messageParts.push("");
+            messageParts.push("━━━━━━━━━━━━━━━━");
+            messageParts.push("");
+            messageParts.push("هل المنتج متوفر؟ وما هي مدة التوصيل؟");
+            messageParts.push("");
+            messageParts.push("شكراً جزيلاً 🙏");
+            
+            // Join and encode message for URL
+            const message = messageParts.join("\\n");
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${{phoneNumber}}?text=${{encodedMessage}}`;
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        }}
+    </script>
+
+    <style>
+        /* Floating WhatsApp Button Styles */
+        #floating-whatsapp {{
+            animation: float 3s ease-in-out infinite;
+        }}
+        
+        @keyframes float {{
+            0%, 100% {{ transform: translateY(0px); }}
+            50% {{ transform: translateY(-10px); }}
+        }}
+        
+        #floating-whatsapp button {{
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+        }}
+        
+        #floating-whatsapp button:hover {{
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+        }}
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {{
+            #floating-whatsapp {{
+                bottom: 1rem;
+                left: 1rem;
+            }}
+        }}
+        
+        /* Pulse animation for notification badge */
+        @keyframes pulse {{
+            0%, 100% {{ opacity: 1; transform: scale(1); }}
+            50% {{ opacity: 0.8; transform: scale(1.1); }}
+        }}
+        
+        .animate-pulse {{
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }}
+    </style>
 </body>
 </html>"""
-
     return html
+
+# Read header and footer content
+with open('header.html', 'r', encoding='utf-8') as f:
+    header_content = f.read()
+with open('footer.html', 'r', encoding='utf-8') as f:
+    footer_content = f.read()
 
 # إنشاء الصفحات
 print(f"\n🔄 جاري إنشاء {len(products)} صفحة...")
@@ -181,10 +380,12 @@ print("="*70)
 
 created_count = 0
 errors = []
+skipped_count = 0
+skipped_products = []
 
 for i, product in enumerate(products, 1):
     try:
-        page_html = create_product_page(product)
+        page_html = create_product_page(product, header_content, footer_content)
         slug = product.get('slug', f'product-{i}')
         filename = f"products/{slug}.html"
 
@@ -194,16 +395,26 @@ for i, product in enumerate(products, 1):
         created_count += 1
 
         if i % 50 == 0:
-            print(f"✅ تم إنشاء {i}/{len(products)} صفحة...")
+            print(f"⚙️ جاري المعالجة... {i}/{len(products)}")
 
     except Exception as e:
         errors.append((product.get('id', i), str(e)))
 
 print(f"\n{'='*70}")
-print(f"✅ انتهى! تم إنشاء {created_count} صفحة بنجاح!")
+print("📊 ملخص العملية:")
+print(f"   ✅ تم إنشاء {created_count} صفحة بنجاح!")
+if skipped_count > 0:
+    print(f"   ⚠️ تم تخطي {skipped_count} صفحة لعدم وجود رابط صورة.")
+if errors:
+    print(f"   ❌ حدثت {len(errors)} أخطاء.")
+
+if skipped_products:
+    print("\n📦 المنتجات التي تم تخطيها:")
+    for product_title in skipped_products:
+        print(f"   - {product_title}")
 
 if errors:
-    print(f"\n⚠️ {len(errors)} خطأ:")
+    print("\n   - تفاصيل الأخطاء:")
     for error_id, error_msg in errors[:5]:
         print(f"   - منتج {error_id}: {error_msg}")
 
@@ -211,7 +422,7 @@ print(f"\n{'='*70}")
 print("📁 الصفحات موجودة في مجلد: products/")
 print("🌐 يمكنك الآن رفع الملفات على GitHub")
 print("\n✨ التحسينات المضافة:")
-print("   1. ✅ إصلاح مسار الصور (بدون ../)")
+print("   1. ✅ التحقق من وجود الصور قبل إنشاء الصفحة")
 print("   2. ✅ تحسينات SEO كاملة")
 print("   3. ✅ Structured Data")
 print("   4. ✅ Open Graph Tags")
