@@ -1,7 +1,7 @@
 *.pyc
 __pycache__/
-products.min.js
 minify_products.py
 .DS_Store
 Thumbs.db
 *.py
+products.js.backup

@@ -174,14 +174,19 @@
         });
     </script>
 
-    <!-- Tailwind CSS (deferred) -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
-    <script defer>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { 'cairo': ['Cairo', 'sans-serif'] },
-                    colors: { 'iraqi-green': '#009933', 'iraqi-red': '#d42129' }
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif']
+                    },
+                    colors: {
+                        'iraqi-green': '#009933',
+                        'iraqi-red': '#d42129',
+                    }
                 }
             }
         }
