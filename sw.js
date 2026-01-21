@@ -3,9 +3,7 @@ const urlsToCache = [
     './',
     './index.html',
     './products.min.js',
-    './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
-    'https://cdn.tailwindcss.com'
+    './manifest.json'
 ];
 
 self.addEventListener('install', function(event) {
@@ -30,9 +28,16 @@ self.addEventListener('fetch', function(event) {
                     }
                     var responseToCache = response.clone();
                     caches.open(CACHE_NAME).then(function(cache) {
-                        cache.put(event.request, responseToCache);
+                        if (cache) {
+                            cache.put(event.request, responseToCache);
+                        }
+                    }).catch(function(e) {
+                        console.log('Cache put failed:', e);
                     });
                     return response;
+                }).catch(function(e) {
+                    console.log('Fetch failed:', e);
+                    throw e;
                 });
             })
     );

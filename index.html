@@ -177,19 +177,21 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'cairo': ['Cairo', 'sans-serif']
-                    },
-                    colors: {
-                        'iraqi-green': '#009933',
-                        'iraqi-red': '#d42129',
+        window.addEventListener('load', function() {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'cairo': ['Cairo', 'sans-serif']
+                        },
+                        colors: {
+                            'iraqi-green': '#009933',
+                            'iraqi-red': '#d42129',
+                        }
                     }
                 }
             }
-        }
+        });
     </script>
 
     <style>
@@ -226,30 +228,29 @@
             <div>
                 <a href="index.html" class="font-bold text-xl">متجر العراق</a>
             </div>
-            <div id="nav-toggle" class="block lg:hidden" style="display: none;">
-                <button aria-label="قائمة التنقل" class="btn btn-gray">
-                    <svg viewBox="0 0 20 20" style="width: 20px; height: 20px; fill: currentColor;">
-                        <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+            <div id="nav-toggle" class="block lg:hidden">
+                <button aria-label="قائمة التنقل" class="flex items-center px-3 py-2 border rounded text-gray-500 border-gray-600 hover:text-gray-800 hover:border-gray-800 transition-colors">
+                    <svg class="fill-current h-5 w-5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <title>Menu</title>
+                        <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
                     </svg>
                 </button>
             </div>
-            <div id="nav-content" class="hidden lg:block" style="width: 100%; display: none;">
-                <a href="index.html" class="block mt-4 mr-4">الرئيسية</a>
-                <a href="legal/return-policy.html" class="block mt-4 mr-4">سياسة الاسترجاع</a>
-                <a href="legal/shipping-policy.html" class="block mt-4 mr-4">سياسة الشحن</a>
-                <a href="legal/privacy-policy.html" class="block mt-4 mr-4">سياسة الخصوصية</a>
-                <a href="legal/terms-of-service.html" class="block mt-4 mr-4">شروط الخدمة</a>
+            <div id="nav-content" class="hidden lg:flex" style="width: 100%;">
+                <a href="index.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-600 hover:text-gray-800 mr-4 transition-colors">الرئيسية</a>
+                <a href="legal/return-policy.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-600 hover:text-gray-800 mr-4 transition-colors">سياسة الاسترجاع</a>
+                <a href="legal/shipping-policy.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-600 hover:text-gray-800 mr-4 transition-colors">سياسة الشحن</a>
+                <a href="legal/privacy-policy.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-600 hover:text-gray-800 mr-4 transition-colors">سياسة الخصوصية</a>
+                <a href="legal/terms-of-service.html" class="block mt-4 lg:inline-block lg:mt-0 text-gray-600 hover:text-gray-800 mr-4 transition-colors">شروط الخدمة</a>
             </div>
         </nav>
         <script>
             (function() {
-                var toggle = document.getElementById('nav-toggle');
-                var content = document.getElementById('nav-content');
-                if (toggle && content) {
-                    toggle.style.display = 'block';
-                    if (window.innerWidth >= 1024) content.style.display = 'block';
-                    toggle.querySelector('button').addEventListener('click', function() {
-                        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                var toggleBtn = document.querySelector('#nav-toggle button');
+                var navContent = document.getElementById('nav-content');
+                if (toggleBtn && navContent) {
+                    toggleBtn.addEventListener('click', function() {
+                        navContent.classList.toggle('hidden');
                     });
                 }
             })();
