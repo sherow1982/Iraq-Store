@@ -28,6 +28,9 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
 
+    <!-- Preconnect for Bootstrap -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
     <!-- Bootstrap RTL CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
 
@@ -329,13 +332,13 @@
     </footer>
 
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
 
     <!-- Products Data -->
-    <script src="products.js"></script>
+    <script src="../products.min.js" defer></script>
 
     <!-- Main Script -->
     <script>
@@ -439,6 +442,13 @@
                 displayProducts();
             }
         });
+    </script>
+    <script>
+        if('serviceWorker' in navigator){
+            window.addEventListener('load', function(){
+                navigator.serviceWorker.register('../sw.js').catch(function(){});
+            });
+        }
     </script>
 </body>
 </html>
